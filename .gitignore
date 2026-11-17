@@ -1,0 +1,11 @@
+# Kredensial & rahasia — JANGAN PERNAH di-commit
+.env
+.env.*
+!.env.example
+
+# Dependensi & log
+node_modules/
+logs/
+
+# Sistem
+.DS_Store

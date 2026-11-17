@@ -1,0 +1,39 @@
+# Contoh unit systemd untuk VPS Linux (Ubuntu/Debian).
+# Cara pakai:
+#   1. Salin file ini ke /etc/systemd/system/zxoxo-bot.service
+#        sudo cp zxoxo-bot.service /etc/systemd/system/zxoxo-bot.service
+#   2. Sesuaikan User= dan WorkingDirectory= dengan VPS kamu.
+#   3. Pastikan file .env sudah ada di WorkingDirectory (jangan ikut di-copy
+#      ke mana pun; systemd hanya membaca lewat EnvironmentFile di bawah bila
+#      kamu mengisinya — default: bot membaca .env sendiri via dotenv).
+#   4. sudo systemctl daemon-reload
+#      sudo systemctl enable zxoxo-bot
+#      sudo systemctl start zxoxo-bot
+#      sudo systemctl status zxoxo-bot
+#      sudo journalctl -u zxoxo-bot -f
+[Unit]
+Description=ZXOXO auto-claim/monitoring bot (check-only by default)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/zxoxo-bot
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=30
+# Service jalan tanpa TTY, jadi bot OTOMATIS memakai log baris biasa.
+# Variabel ini menegaskan perilaku itu (tanpa escape sequence ANSI di journal).
+Environment="TERMINAL_UI=false"
+# Dashboard web mati secara default; nyalakan bila perlu dengan mengubah
+# WEB_DASHBOARD=true di .env (akses via SSH tunnel, bukan dibuka ke publik).
+# Batasi resource secukupnya (bot ini ringan).
+MemoryMax=512M
+CPUQuota=50%
+# Jangan menulis log systemd yang sensitif — log bot ada di logs/.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
